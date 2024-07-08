@@ -43,6 +43,8 @@ import { execAwaitedModal } from '../execAwaitedModal';
 import { CustomSwitch } from '../Switch/Switch';
 import { useAppStyles } from './app.styles';
 import { useReceivedInvoiceLineBuildTable } from './useReceivedInvoiceLineBuildTable';
+import { useReceivedInvoiceLineBuildTableChapter } from './useReceivedInvoiceLineBuildTableChapter';
+
 import { useTogglingElements } from './useTogglingElements';
 
 require('babel-polyfill');
@@ -57,7 +59,7 @@ export function App() {
   const [selectValue, setSelectValue] = useState(null);
   const [notificationsTurnedOn, setNotificationsTurnedOn] = useState(false);
   const formRef = useRef(null);
-
+  const [viewTable, setViewTable] = useState(false);
   const onAction = e => {
     setSubmitted(true);
     // alert('lol');
@@ -86,6 +88,41 @@ export function App() {
       date: e?.target?.value
     }));
   }
+
+  const dataChapter = useRef([
+    {
+      id: '223a',
+      isAccordionHeader: true,
+      itemCategory: 'Adecuaciones',
+      itemDescription: 'Adecuaciones',
+      toogleProperty: 'Adecuaciones'
+    },
+    {
+      id: '223a12',
+      isAccordionHeader: 'itemCategorySubSpeciality',
+      itemCategory: 'Adecuaciones',
+      itemDescription: '3',
+      toogleProperty: '3',
+      parent: 'Adecuaciones',
+      tabulationLevel: 1
+    },
+    {
+      id: '12121ad',
+      assetReference: '123123',
+      itemCategory: 'Adecuaciones',
+      itemCategoryId: '223a',
+      itemCategorySubspeciality: '3',
+      itemCategorySubspecialityId: '223a12',
+      itemCategorySubspecialityParentId: null,
+      itemCategorySubSpecialityPath: '3',
+      itemDescription: 'descripció 123123',
+      itemReference: 'referència 123423',
+      parents: ['3'],
+      quantity: 12,
+      quantityAwarded: 12,
+      tabulationLevel: 1
+    }
+  ]);
 
   const data = useRef([
     {
@@ -317,7 +354,7 @@ export function App() {
       externalReference: '965F327C-3064-4B6C-B84B-84B244CF4AAD',
       districtId: '727558c5-7999-4b76-946e-06b6d44af4f3',
       quantity: 1,
-      amount: 289,
+      amount: 2891,
       description: 'OK_AD-0001/2022 | CAS-1 | OKUANT_0001 ',
       isTaxExempt: true,
       additional: true,
@@ -336,15 +373,19 @@ export function App() {
     }
   ]);
 
+  const {
+    rows: rowsChapter,
+    headCells: headCellsChapter,
+    getReceivedInvoiceLines: getReceivedInvoiceLinesChapter
+  } = useReceivedInvoiceLineBuildTableChapter(dataChapter?.current, () => console.log('lol'), false);
+
   const { rows, headCells, getReceivedInvoiceLines } = useReceivedInvoiceLineBuildTable(
     data?.current,
     () => console.log('lol'),
     false
   );
 
-  const { onToggleElement, isToggled } = useTogglingElements({
-    toggleProperty: 'externalReference'
-  });
+  const { onToggleElement, isToggled, isVisible } = useTogglingElements(true);
 
   const filmsOptions = [
     {
@@ -361,7 +402,6 @@ export function App() {
       name: 'The Godfather: Part II'
     }
   ];
-
   return (
     <>
       <MuiPickersUtilsProvider utils={MomentUtils}>
@@ -1019,32 +1059,50 @@ export function App() {
               </Form>
             </DialogModal>
           </div>
+          <Button onClick={() => setViewTable(prevSt => !prevSt)}>canvio</Button>
           <div
             style={{
               margin: '2rem'
             }}
           >
-            <ViewTable
-              rows={rows}
-              cells={headCells}
-              defaultOrderBy={{ property: 'amount', direction: 'asc' }}
-              disableOrderBy={true}
-              // allowRowToggling={true}
-              // isToggled={isToggled}
-              // onToggleElement={onToggleElement}
-              onFetchData={getReceivedInvoiceLines}
-              checkRowWhen={element => element.canBeDeleted}
-              checkRowDisabledReason={'disabled'}
-              // allowRowChecking={false}
-              // onCheckElement={onCheckElement}
-              // onCheckAllElements={onCheckAllElements}
-              // checkedElements={checkedElements}
-              emptyText={'no results!'}
-              nextIconButtonText={'nexttt'}
-              dateFormat="DD/MM/YYYY"
-              // numberRowsPerPage={5}
-              // rowPerPageOptions={[]}
-            />
+            {!viewTable && (
+              <ViewTable
+                rows={rows}
+                cells={headCells}
+                defaultOrderBy={{ property: 'amount', direction: 'asc' }}
+                disableOrderBy={true}
+                onFetchData={getReceivedInvoiceLines}
+                checkRowWhen={element => element.canBeDeleted}
+                checkRowDisabledReason={'disabled'}
+                emptyText={'no results!'}
+                nextIconButtonText={'nexttt'}
+                dateFormat="DD/MM/YYYY"
+              />
+            )}
+            {viewTable && (
+              <ViewTable
+                rows={rowsChapter}
+                cells={headCellsChapter}
+                defaultOrderBy={{ property: 'amount', direction: 'asc' }}
+                disableOrderBy={true}
+                allowRowToggling={true}
+                isToggled={isToggled}
+                isVisible={isVisible}
+                onToggleElement={onToggleElement}
+                onFetchData={getReceivedInvoiceLinesChapter}
+                checkRowWhen={element => element.canBeDeleted}
+                checkRowDisabledReason={'disabled'}
+                // allowRowChecking={false}
+                // onCheckElement={onCheckElement}
+                // onCheckAllElements={onCheckAllElements}
+                // checkedElements={checkedElements}
+                emptyText={'no results!'}
+                nextIconButtonText={'nexttt'}
+                dateFormat="DD/MM/YYYY"
+                // numberRowsPerPage={5}
+                // rowPerPageOptions={[]}
+              />
+            )}
           </div>
         </Form>
       </MuiPickersUtilsProvider>

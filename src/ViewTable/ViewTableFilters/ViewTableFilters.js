@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import ChipInput from 'material-ui-chip-input';
 import * as moment from 'moment';
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import shortid from 'shortid';
 
 import { LocaleDatePicker } from '../../LocaleDatePicker';
@@ -35,6 +35,11 @@ function FilterSwitch({
       onChange(pickerName, value);
     }
   };
+  useEffect(() => {
+    if (cell?.filterValue) {
+      setInputs(prev => ({ ...prev, [cell.id]: cell?.filterValue }));
+    }
+  }, [cell?.filterValue, cell.id]);
 
   switch (cell.filterType) {
     case FILTER_TYPE.NONE:
@@ -127,7 +132,14 @@ function FilterSwitch({
         <TextField
           fullWidth
           defaultValue={inputs[cell.filterBy || cell.id]}
-          onChange={e => onChange(cell.id, e.target.value)}
+          value={inputs[cell.id]}
+          onChange={e => {
+            setInputs(prev => ({
+              ...prev,
+              [cell.id]: e.target.value
+            }));
+            onChange(cell.id, e.target.value);
+          }}
         />
       );
   }
