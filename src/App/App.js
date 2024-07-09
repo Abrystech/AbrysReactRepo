@@ -4,7 +4,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import DoneIcon from '@material-ui/icons/Done';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import clsx from 'clsx';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import { Grid } from '@material-ui/core';
 import {
@@ -49,6 +49,8 @@ import { useTogglingElements } from './useTogglingElements';
 
 require('babel-polyfill');
 
+const TABLE_CONFIGURATIONS_STORAGE = 'HEAD_CELLS';
+
 export function App() {
   const classes = useAppStyles();
   const [openModal, setOpenModal] = useState(false);
@@ -59,7 +61,7 @@ export function App() {
   const [selectValue, setSelectValue] = useState(null);
   const [notificationsTurnedOn, setNotificationsTurnedOn] = useState(false);
   const formRef = useRef(null);
-  const [viewTable, setViewTable] = useState(false);
+  const [chapterMode, setChapterMode] = useState(false);
   const onAction = e => {
     setSubmitted(true);
     // alert('lol');
@@ -384,6 +386,58 @@ export function App() {
     () => console.log('lol'),
     false
   );
+
+  const [customColumns, setCustomColumns] = useState(headCells);
+  const defaultColumns = headCells.filter(c => c.id === 'description' || c.id === 'anyDate');
+  const tableName = 'ENGLOBITY_TABLE';
+
+  useEffect(() => {
+    const savedData = localStorage.getItem(`${tableName}_${TABLE_CONFIGURATIONS_STORAGE}`);
+    if (savedData) {
+      const parsedData = savedData.split(',');
+      setCustomColumns(headCells.filter(hc => parsedData.includes(hc.id)));
+    } else {
+      setCustomColumns(defaultColumns);
+    }
+  }, []);
+
+  const saveTableConfig = headNames => {
+    localStorage.setItem(`${tableName}_${TABLE_CONFIGURATIONS_STORAGE}`, headNames);
+  };
+
+  const handleColumnVisiblity = column => {
+    if (customColumns?.find(c => c.id === column.id) && customColumns?.filter(col => !col.action).length - 1 < 1) {
+      errorToaster('At least 1 column must be visible.');
+    } else {
+      setCustomColumns(prevCustomColumns =>
+        headCells.reduce((result, cell) => {
+          const prevColumn = prevCustomColumns?.find(c => c.id === cell.id);
+          if (cell.id === column.id) {
+            if (!customColumns?.find(c => c.id === column.id)) {
+              result.push(column);
+            }
+          } else {
+            if (prevColumn) {
+              result.push(cell);
+            }
+          }
+          return result;
+        }, [])
+      );
+    }
+  };
+
+  const columnMapperForButton = columns => {
+    return columns.reduce((result, cell) => {
+      if (!cell.action) {
+        result.push({
+          text: `${customColumns?.find(dc => dc.id === cell.id) ? '✓ ' : '〤 '}${cell.label}`,
+          action: () => handleColumnVisiblity(cell)
+        });
+      }
+      return result;
+    }, []);
+  };
 
   const { onToggleElement, isToggled, isVisible } = useTogglingElements(true);
 
@@ -1059,16 +1113,30 @@ export function App() {
               </Form>
             </DialogModal>
           </div>
-          <Button onClick={() => setViewTable(prevSt => !prevSt)}>canvio</Button>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-around',
+              margin: '2rem'
+            }}
+          >
+            <Button onClick={() => setChapterMode(prevSt => !prevSt)}>Cambio</Button>
+            <ButtonMulti
+              text={'Manage columns'}
+              actions={columnMapperForButton(headCells)}
+              keepOpenAfterSelect={true}
+              onClickAway={() => saveTableConfig(customColumns.map(cc => cc.id))}
+            />
+          </div>
           <div
             style={{
               margin: '2rem'
             }}
           >
-            {!viewTable && (
+            {!chapterMode && (
               <ViewTable
                 rows={rows}
-                cells={headCells}
+                cells={customColumns}
                 defaultOrderBy={{ property: 'amount', direction: 'asc' }}
                 disableOrderBy={true}
                 onFetchData={getReceivedInvoiceLines}
@@ -1077,9 +1145,10 @@ export function App() {
                 emptyText={'no results!'}
                 nextIconButtonText={'nexttt'}
                 dateFormat="DD/MM/YYYY"
+                allowRowChecking={false}
               />
             )}
-            {viewTable && (
+            {chapterMode && (
               <ViewTable
                 rows={rowsChapter}
                 cells={headCellsChapter}

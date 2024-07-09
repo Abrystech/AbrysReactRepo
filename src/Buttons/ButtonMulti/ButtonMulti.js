@@ -1,19 +1,31 @@
-import React, { useState, useRef } from 'react';
-import PropTypes from 'prop-types';
-import { useButtonStyles } from './buttonMulti.styles';
-import clsx from 'clsx';
+import { ButtonGroup, ClickAwayListener, Grow, MenuItem, MenuList, Popper } from '@material-ui/core';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
+import clsx from 'clsx';
+import PropTypes from 'prop-types';
+import React, { useRef, useState } from 'react';
 import { Button } from '../Button';
-import { Popper, Grow, ClickAwayListener, MenuList, ButtonGroup, MenuItem } from '@material-ui/core';
+import { useButtonStyles } from './buttonMulti.styles';
 
-export function ButtonMulti({ text, icon, actions, tooltip, disabled, className, popperClassName, loading, ...props }) {
+export function ButtonMulti({
+  text,
+  icon,
+  actions,
+  tooltip,
+  disabled,
+  className,
+  popperClassName,
+  loading,
+  keepOpenAfterSelect,
+  onClickAway,
+  ...props
+}) {
   const styles = useButtonStyles();
   const [popperOpened, setPopperOpened] = useState(false);
   const anchorRef = useRef(null);
 
   function renderButton() {
     const onClickAction = action => {
-      setPopperOpened(false);
+      !keepOpenAfterSelect && setPopperOpened(false);
       action.action();
     };
 
@@ -50,7 +62,12 @@ export function ButtonMulti({ text, icon, actions, tooltip, disabled, className,
                   transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom'
                 }}
               >
-                <ClickAwayListener onClickAway={() => setPopperOpened(false)}>
+                <ClickAwayListener
+                  onClickAway={() => {
+                    onClickAway && onClickAway();
+                    setPopperOpened(false);
+                  }}
+                >
                   <MenuList
                     id="split-button-menu"
                     style={{
