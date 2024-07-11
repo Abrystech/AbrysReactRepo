@@ -4,7 +4,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import DoneIcon from '@material-ui/icons/Done';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import clsx from 'clsx';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 
 import { Grid } from '@material-ui/core';
 import {
@@ -42,14 +42,12 @@ import {
 import { execAwaitedModal } from '../execAwaitedModal';
 import { CustomSwitch } from '../Switch/Switch';
 import { useAppStyles } from './app.styles';
+import { useManageColumns } from './useManageColumns/useManageColumns';
 import { useReceivedInvoiceLineBuildTable } from './useReceivedInvoiceLineBuildTable';
 import { useReceivedInvoiceLineBuildTableChapter } from './useReceivedInvoiceLineBuildTableChapter';
-
 import { useTogglingElements } from './useTogglingElements';
 
 require('babel-polyfill');
-
-const TABLE_CONFIGURATIONS_STORAGE = 'HEAD_CELLS';
 
 export function App() {
   const classes = useAppStyles();
@@ -387,57 +385,13 @@ export function App() {
     false
   );
 
-  const [customColumns, setCustomColumns] = useState(headCells);
-  const defaultColumns = headCells.filter(c => c.id === 'description' || c.id === 'anyDate');
-  const tableName = 'ENGLOBITY_TABLE';
-
-  useEffect(() => {
-    const savedData = localStorage.getItem(`${tableName}_${TABLE_CONFIGURATIONS_STORAGE}`);
-    if (savedData) {
-      const parsedData = savedData.split(',');
-      setCustomColumns(headCells.filter(hc => parsedData.includes(hc.id)));
-    } else {
-      setCustomColumns(defaultColumns);
-    }
-  }, []);
-
-  const saveTableConfig = headNames => {
-    localStorage.setItem(`${tableName}_${TABLE_CONFIGURATIONS_STORAGE}`, headNames);
-  };
-
-  const handleColumnVisiblity = column => {
-    if (customColumns?.find(c => c.id === column.id) && customColumns?.filter(col => !col.action).length - 1 < 1) {
-      errorToaster('At least 1 column must be visible.');
-    } else {
-      setCustomColumns(prevCustomColumns =>
-        headCells.reduce((result, cell) => {
-          const prevColumn = prevCustomColumns?.find(c => c.id === cell.id);
-          if (cell.id === column.id) {
-            if (!customColumns?.find(c => c.id === column.id)) {
-              result.push(column);
-            }
-          } else {
-            if (prevColumn) {
-              result.push(cell);
-            }
-          }
-          return result;
-        }, [])
-      );
-    }
-  };
-
-  const columnMapperForButton = columns => {
-    return columns.reduce((result, cell) => {
-      if (!cell.action) {
-        result.push({
-          text: `${customColumns?.find(dc => dc.id === cell.id) ? '✓ ' : '〤 '}${cell.label}`,
-          action: () => handleColumnVisiblity(cell)
-        });
-      }
-      return result;
-    }, []);
-  };
+  const { customColumns, columnMapperForButton, saveTableConfig } = useManageColumns({
+    tableName: 'ENGLOBITY_TABLE',
+    headCells: chapterMode ? headCellsChapter : headCells,
+    defaultColumns: (chapterMode ? headCellsChapter : headCells).filter(
+      c => c.id === 'description' || c.id === 'anyDate'
+    )
+  });
 
   const { onToggleElement, isToggled, isVisible } = useTogglingElements(true);
 
@@ -1123,7 +1077,7 @@ export function App() {
             <Button onClick={() => setChapterMode(prevSt => !prevSt)}>Cambio</Button>
             <ButtonMulti
               text={'Manage columns'}
-              actions={columnMapperForButton(headCells)}
+              actions={columnMapperForButton}
               keepOpenAfterSelect={true}
               onClickAway={() => saveTableConfig(customColumns.map(cc => cc.id))}
             />
@@ -1151,7 +1105,7 @@ export function App() {
             {chapterMode && (
               <ViewTable
                 rows={rowsChapter}
-                cells={headCellsChapter}
+                cells={customColumns}
                 defaultOrderBy={{ property: 'amount', direction: 'asc' }}
                 disableOrderBy={true}
                 allowRowToggling={true}
