@@ -29,7 +29,7 @@ export const useViewTableStyles = makeStyles(theme => ({
     maxHeight: '76vh',
     borderRadius: '4px 4px 0px 0px'
   },
-  cellDate: { minWidth: '18vw' },
+  cellDate: { minWidth: '14vw' },
   table: {
     background: 'white',
     // minWidth: 750,

@@ -1,6 +1,6 @@
 {
   "name": "@engloba-tech/englobity",
-  "version": "0.2.32",
+  "version": "0.2.33",
   "description": "Customs web components with React and Material",
   "scripts": {
     "test": "cross-env NODE_ENV=test npm run lint && jest --coverage",

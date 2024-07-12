@@ -431,7 +431,24 @@ export function App() {
               // icon={<SearchIcon />}
               getOptionLabel={option => option.coolerName ?? option.name}
               getOptionSelected={(option, value) => option.id === value.id}
-              requestAction={queryString => filmsOptions}
+              requestAction={queryString =>
+                queryString ? filmsOptions?.filter(fo => fo.name.includes(queryString)) : filmsOptions
+              }
+            />
+            <AsyncInputAutocomplete
+              // onChange={(e, element) => handleAddDocumentType(element)}
+              style={{ width: '300px' }}
+              onChange={(e, element) => null}
+              label={'Composed Autocomplete'}
+              value={{ id: inputs?.documentTypeId, name: inputs?.documentType }}
+              defaultInputValue={inputs?.documentType}
+              // icon={<SearchIcon />}
+              getOptionLabel={option => (option.coolerName ? `${option.coolerName} - ${option.name}` : option.name)}
+              getOptionSelected={(option, value) => option.id === value.id}
+              requestAction={queryString =>
+                queryString ? filmsOptions?.filter(fo => fo.name.includes(queryString)) : filmsOptions
+              }
+              composed
             />
           </div>
           <div
