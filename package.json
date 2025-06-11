@@ -1,6 +1,6 @@
 {
-  "name": "@engloba-tech/englobity",
-  "version": "0.2.34",
+  "name": "@abrystech/abrysreactrepo",
+  "version": "0.2.35",
   "description": "Customs web components with React and Material",
   "scripts": {
     "test": "cross-env NODE_ENV=test npm run lint && jest --coverage",
@@ -18,7 +18,7 @@
     "material-ui",
     "react",
     "components",
-    "engloba",
+    "abrys",
     "validation",
     "chip",
     "input",
@@ -147,12 +147,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Engloba-Tech/englobity.git"
+    "url": "git+https://github.com/Abrystech/AbrysReactRepo.git"
   },
-  "author": "engloba-tech",
+  "author": "Abrystech",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Engloba-Tech/englobity/issues"
+    "url": "https://github.com/Abrystech/AbrysReactRepo/issues"
   },
-  "homepage": "https://github.com/Engloba-Tech/englobity#readme"
+  "homepage": "https://github.com/Abrystech/AbrysReactRepo#readme"
 }

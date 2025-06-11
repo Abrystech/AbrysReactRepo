@@ -11,7 +11,7 @@ export const useViewTableFiltersStyles = makeStyles(theme => ({
   },
   date: {
     position: 'absolute',
-    width: '50%',
+    width: '49.5%',
     bottom: '0',
     '& .MuiInputBase-input': {
       textAlign: 'center'
