@@ -29,6 +29,7 @@ export function AsyncInputAutocomplete({
   skeletonHeight = 48,
   inputVariant,
   composed, // <-- If the input is painting the option with more text, like stars or something else, we need this prop to avoid bugs
+  sortedProp,
   ...props
 }) {
   const { isOpen, handleClose, handleOpen } = useHandleOpen(false);
@@ -112,27 +113,36 @@ export function AsyncInputAutocomplete({
 
       // WIP - Workarround, we should refactor the dropdowns to always get data formatted as Id, Name
       if (response) {
-        if (response[0].name) {
+        if (sortedProp) {
           setOptions(
-            Object.keys(response)
-              .map(index => response[index])
-              .sort((a, b) => a.name.localeCompare(b.name))
-          );
-        } else if (response[0].reference) {
-          setOptions(
-            Object.keys(response)
-              .map(index => response[index])
-              .sort((a, b) => a.reference.localeCompare(b.reference))
-          );
-        } else if (response[0].alias) {
-          setOptions(
-            Object.keys(response)
-              .map(index => response[index])
-              .sort((a, b) => a.alias.localeCompare(b.alias))
-          );
+              Object.keys(response)
+                .map(index => response[index])
+                .sort((a, b) => a[sortedProp].localeCompare(b[sortedProp]))
+            );
         } else {
-          setOptions(Object.keys(response).map(index => response[index]));
+          if (response[0].name) {
+            setOptions(
+              Object.keys(response)
+                .map(index => response[index])
+                .sort((a, b) => a.name.localeCompare(b.name))
+            );
+          } else if (response[0].reference) {
+            setOptions(
+              Object.keys(response)
+                .map(index => response[index])
+                .sort((a, b) => a.reference.localeCompare(b.reference))
+            );
+          } else if (response[0].alias) {
+            setOptions(
+              Object.keys(response)
+                .map(index => response[index])
+                .sort((a, b) => a.alias.localeCompare(b.alias))
+            );
+          } else {
+            setOptions(Object.keys(response).map(index => response[index]));
+          }
         }
+      
         setStartLoading(false);
       }
     } catch (error) {
@@ -211,5 +221,6 @@ AsyncInputAutocomplete.propTypes = {
   errorMessages: PropTypes.arrayOf(PropTypes.string),
   skeletonHeight: PropTypes.number,
   composed: PropTypes.bool,
+  sortedProp: PropTypes.string,
   inputVariant: PropTypes.string
 };

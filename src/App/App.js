@@ -410,6 +410,25 @@ export function App() {
       name: 'The Godfather: Part II'
     }
   ];
+
+  const friendlyNameOptions = [
+    {
+      id: 2,
+      name: 'a_nombre',
+      friendlyName: 'Nombre 2'
+    },
+    {
+      id: 1,
+      name: 'b_nombre',
+      friendlyName: 'Nombre 1'
+    },
+    {
+      id: 3,
+      name: 'c_nombre',
+      friendlyName: 'Nombre 3'
+    }
+  ];
+
   return (
     <>
       <MuiPickersUtilsProvider utils={MomentUtils}>
@@ -448,6 +467,24 @@ export function App() {
               requestAction={queryString =>
                 queryString ? filmsOptions?.filter(fo => fo.name.includes(queryString)) : filmsOptions
               }
+              composed
+            />
+            <AsyncInputAutocomplete
+              // onChange={(e, element) => handleAddDocumentType(element)}
+              style={{ width: '300px' }}
+              onChange={(e, element) => null}
+              label={'SortedProp Autocomplete'}
+              value={{ id: inputs?.documentTypeId, name: inputs?.documentType }}
+              defaultInputValue={inputs?.documentType}
+              // icon={<SearchIcon />}
+              getOptionLabel={option => option.friendlyName}
+              getOptionSelected={(option, value) => option.id === value.id}
+              requestAction={queryString =>
+                queryString
+                  ? friendlyNameOptions?.filter(fo => fo.friendlyName.includes(queryString))
+                  : friendlyNameOptions
+              }
+              sortedProp={'friendlyName'}
               composed
             />
           </div>
