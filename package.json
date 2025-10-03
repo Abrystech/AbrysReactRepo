@@ -1,6 +1,6 @@
 {
   "name": "@abrystech/abrysreactrepo",
-  "version": "0.2.36",
+  "version": "0.2.37",
   "description": "Customs web components with React and Material",
   "scripts": {
     "test": "cross-env NODE_ENV=test npm run lint && jest --coverage",
@@ -11,7 +11,7 @@
     "build": "npm run clean && npm run build:umd && npm run build:es",
     "build:umd": "rollup -c",
     "build:es": "cross-env BABEL_ENV=es babel ./src --out-dir ./dist/es --ignore '**/*.test.js'",
-    "prepublish": "npm run build",
+    "prepublishOnly": "npm run build",
     "lint": "eslint \"./src/**/*.{js,jsx}\""
   },
   "keywords": [

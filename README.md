@@ -1,10 +1,10 @@
-# Englobity
+# AbrysReactRepo
 
 React Material-ui custom web components
 
 ## Installation
 
-> npm i --save @material-ui/pickers @material-ui/core @material-ui/lab @engloba-tech/englobity
+> npm i --save @material-ui/pickers @material-ui/core @material-ui/lab @abrystech/abrysreactrepo
 
 After Instalation, we must initiate englobityTheme.
 
