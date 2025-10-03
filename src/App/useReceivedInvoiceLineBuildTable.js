@@ -37,6 +37,13 @@ export const useReceivedInvoiceLineBuildTable = (inputs, handleSelect, chapterMo
         label: 'Description'
       },
       {
+        id: 'elipsis',
+        label: 'Elipsis',
+        ellipsis: true,
+        numeric: false,
+        disablePadding: true
+      },
+      {
         id: 'quantity',
         numeric: false,
         disablePadding: true,
@@ -129,6 +136,7 @@ export const useReceivedInvoiceLineBuildTable = (inputs, handleSelect, chapterMo
           id: receivedInvoiceLine.id + 'chapter',
           externalReference: receivedInvoiceLine.externalReference,
           description: receivedInvoiceLine.workOrder,
+          elipsis: receivedInvoiceLine.workOrder,
           workOrder: receivedInvoiceLine.workOrder,
           total: 12,
           isAccordionHeader: true,
@@ -157,6 +165,7 @@ export const useReceivedInvoiceLineBuildTable = (inputs, handleSelect, chapterMo
           externalReference: receivedInvoiceLine.externalReference,
           quantity: receivedInvoiceLine.quantity,
           description: receivedInvoiceLine.description,
+          elipsis: receivedInvoiceLine.description,
           amountUnformatted: receivedInvoiceLine.amount,
           amount: skeletonHelper.isSkeletonLoading(receivedInvoiceLine.amount)
             ? receivedInvoiceLine.amount
